@@ -13,6 +13,7 @@ from .xlsToDatabase import (
 class WorkSpace:
     def __init__(self, path):
         self.path_directory = PathDirectory(home=path)
+        self.url_base = "http://localhost:8000/"
 
     def clean_workspace(self):
         self.path_directory.clean_work_directory()

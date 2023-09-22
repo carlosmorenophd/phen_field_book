@@ -90,6 +90,7 @@ def get_dictionary_by_entity(entity, head, csv_dictionary):
     array_dictionary = []
     for key in csv_dictionary:
         dictio_to_save = {}
+        print (csv_dictionary[key])
         for head_key in head:
             column = convert_head_csv_to_column(entity, head_csv=head[head_key],
                                                 value=csv_dictionary[key][head_key])
