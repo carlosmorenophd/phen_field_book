@@ -25,25 +25,90 @@ class WorkSpace:
 
     def storage_on_database(self):
         for location in get_locations(self.path_directory.get_work_directory()):
-            url = "http://localhost/locations"
-            r = requests.post(
+            url = "http://localhost:8000/locations"
+            response = requests.post(
                 url=url,
                 headers={"Accept": "application/json"},
                 json=location,
             )
+            if not response.ok()
+                print(response.text())
         for genotype in get_genotypes(self.path_directory.get_work_directory()):
-            url = "http://localhost/genotypes"
-            r = requests.post(
-                url=url,
+            response = requests.post(
+                url="http://localhost:8000/genotypes",
                 headers={"Accept": "application/json"},
                 json=genotype,
             )
-        for raw_collections in get_raw_collections(self.path_directory.get_work_directory()):
-            print(raw_collections)
-            url = "http://localhost/raw_collections/"
-            r = requests.post(
-                url=url,
+            if not response.ok:
+                print(response.text())
+        for raw_collections in get_raw_collections(
+            self.path_directory.get_work_directory()
+        ):
+            trail = dict()
+            trail["name"] = raw_collections.pop("trails.name")
+            response = requests.post(
+                url="http://localhost:8000/trails/",
                 headers={"Accept": "application/json"},
-                json=genotype,
+                json=trail,
             )
+            if not response.ok:
+                print(response.text())
+            raw_collections["trail_id"] = response.json()["id"]
+            number = raw_collections.pop("locations.number")
+            raw_collections.pop("locations.country")
+            raw_collections.pop("locations.description")
+            response = requests.get(
+                url="http://localhost:8000/locations/",
+                headers={"Accept": "application/json"},
+                params={"number": int(number)},
+            )
+            if not response.ok:
+                print(response.text())
+            raw_collections["location_id"] = response.json()["id"]
+            ids = {
+                "c_id": raw_collections.pop("genotypes.c_id"),
+                "s_id": raw_collections.pop("genotypes.s_id"),
+            }
+            raw_collections.pop("genotypes.cross_name")
+            response = requests.get(
+                url="http://localhost:8000/genotypes/",
+                headers={"Accept": "application/json"},
+                params=ids,
+            )
+            if not response.ok:
+                print(response.text())
+            raw_collections["genotype_id"] = response.json()["id"]
+            trait = {
+                "name": raw_collections["traits.name"],
+                "number": raw_collections["traits.trait_number"],
+                "description": "",
+                "co_trait_name": "",
+                "variable_name": "",
+                "co_id": "",
+            }
+            response = requests.post(
+                url="http://localhost:8000/traits/",
+                headers={"Accept": "application/json"},
+                json=trait,
+            )
+            if not response.ok:
+                print(response.text())
+            raw_collections["trait_id"] = response.json()["id"]
+
+            response = requests.post(
+                url="http://localhost:8000/units/",
+                headers={"Accept": "application/json"},
+                json={"name": raw_collections.pop("units.name")},
+            )
+            if not response.ok:
+                print(response.text())
+            raw_collections["unit_id"] = response.json()["id"]
+
+            response = requests.post(
+                url="http://localhost:8000/raw_collections/",
+                headers={"Accept": "application/json"},
+                json=raw_collections,
+            )
+            if not response.ok:
+                print(response.text())
         var = get_trait_details(self.path_directory.get_work_directory())

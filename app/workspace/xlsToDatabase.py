@@ -4,7 +4,7 @@ import requests
 
 
 def get_locations(path):
-    file_name = rename_file_csv(path=path, source='51ST IDYN_Loc_data.xls', destiny='location.csv')
+    file_name = rename_file_csv(path=path, source='52ND IDYN_Loc_data.xls', destiny='location.csv')
     if os.path.isfile(file_name):
         csv_data = pd.read_csv(file_name, delimiter='\t', engine='python', header=None, )
         csv_dictionary = csv_data.to_dict('index')
@@ -15,7 +15,7 @@ def get_locations(path):
 
 
 def get_genotypes(path):
-    file_name = rename_file_csv(path=path, source='51ST IDYN_Genotypes_Data.xls', destiny='genotypes.csv')
+    file_name = rename_file_csv(path=path, source='52ND IDYN_Genotypes_Data.xls', destiny='genotypes.csv')
     if os.path.isfile(file_name):
         csv_data = pd.read_csv(file_name, delimiter='\t', engine='python', header=None, encoding='ISO-8859-1')
         csv_dictionary = csv_data.to_dict('index')
@@ -26,7 +26,7 @@ def get_genotypes(path):
 
 
 def get_raw_collections(path):
-    file_name = rename_file_csv(path=path, source='51ST IDYN_RawData.xls', destiny='raw.csv')
+    file_name = rename_file_csv(path=path, source='52ND IDYN_RawData.xls', destiny='raw.csv')
     if os.path.isfile(file_name):
         csv_data = pd.read_csv(file_name, delimiter='\t', engine='python', header=None, encoding='ISO-8859-1')
         csv_dictionary = csv_data.to_dict('index')
@@ -37,7 +37,7 @@ def get_raw_collections(path):
 
 
 def get_trait_details(path):
-    file_name = os.path.join(path, '51ST IDYN.xls')
+    file_name = os.path.join(path, '52ND IDYN.xls')
     if os.path.isfile(file_name):
         csv_data = pd.read_excel(file_name, sheet_name=None)
         entities = []
@@ -175,7 +175,7 @@ def convert_head_csv_to_column(entity, head_csv, value):
         elif head_csv == 'Plot':
             return {'name': 'plot', 'value': int(value)}
         elif head_csv == 'Value':
-            return {'name': 'value', 'value': str(value)}
+            return {'name': 'value_data', 'value': str(value)}
         elif head_csv == 'Unit':
             return {'name': 'units.name', 'value': str(value)}
         else:
