@@ -31,7 +31,7 @@ def get_raw_collections(path):
         csv_data = pd.read_csv(file_name, delimiter='\t', engine='python', header=None, encoding='ISO-8859-1')
         csv_dictionary = csv_data.to_dict('index')
         head = csv_dictionary.pop(0)
-        return get_dictionary_by_entity(entity='raw_collections', head=head, csv_dictionary=csv_dictionary)
+        return get_dictionary_by_entity(entity='raw_collections', head=head, csv_dictionary=csv_dictionary, add_hash=True)
     else:
         raise FileNotFoundError('Filing to save file or not exist it')
 
@@ -86,17 +86,21 @@ def get_trait_details(path):
         raise FileNotFoundError('Filing to save file or not exist it')
 
 
-def get_dictionary_by_entity(entity, head, csv_dictionary):
+def get_dictionary_by_entity(entity, head, csv_dictionary, add_hash: bool = False ):
     array_dictionary = []
     for key in csv_dictionary:
-        dictio_to_save = {}
-        print (csv_dictionary[key])
+        dictionary_to_save = {}
         for head_key in head:
             column = convert_head_csv_to_column(entity, head_csv=head[head_key],
                                                 value=csv_dictionary[key][head_key])
             if column['name'] != 'None':
-                dictio_to_save[column['name']] = column['value']
-        array_dictionary.append(dictio_to_save)
+                dictionary_to_save[column['name']] = column['value']
+        if add_hash:
+            create_hash = hash(frozenset(csv_dictionary[key].items()))
+            # print (create_hash.items())
+            # print(hash(frozenset(create_hash.items())))
+            dictionary_to_save['hash'] = create_hash
+        array_dictionary.append(dictionary_to_save)
     return array_dictionary
 
 
@@ -176,7 +180,7 @@ def convert_head_csv_to_column(entity, head_csv, value):
         elif head_csv == 'Plot':
             return {'name': 'plot', 'value': int(value)}
         elif head_csv == 'Value':
-            return {'name': 'value', 'value': str(value)}
+            return {'name': 'value_data', 'value': str(value)}
         elif head_csv == 'Unit':
             return {'name': 'units.name', 'value': str(value)}
         else:

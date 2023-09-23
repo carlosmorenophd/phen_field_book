@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
     "cSpell.ignoreWords": [
         "backref",
         "dotenv",
@@ -11,4 +12,7 @@
     "workbench.colorCustomizations": {
         "activityBar.background": "#a5af9e"
     }
+=======
+
+>>>>>>> develop
 }
