@@ -13,7 +13,7 @@ from .xlsToDatabase import (
 class WorkSpace:
     def __init__(self, path):
         self.path_directory = PathDirectory(home=path)
-        self.url_base = "http://localhost:8000/"
+        self.url_base = "http://localhost:8000"
 
     def clean_workspace(self):
         self.path_directory.clean_work_directory()
@@ -104,7 +104,7 @@ class WorkSpace:
             if not response.ok:
                 print(response.text())
             raw_collections["unit_id"] = response.json()["id"]
-            
+
             raw_collections["hash_raw"] = str(raw_collections.pop("hash"))
             response = requests.post(
                 url="http://localhost:8000/raw_collections/",
@@ -113,4 +113,73 @@ class WorkSpace:
             )
             if not response.ok:
                 print(response.text())
-        var = get_trait_details(self.path_directory.get_work_directory())
+        for trait_detail in get_trait_details(self.path_directory.get_work_directory()):
+            print(trait_detail)
+            if "variable_ontologies" in trait_detail:
+                variable_ontologies = trait_detail.pop("variable_ontologies")
+                crop_ontologies = trait_detail.pop("crop_ontologies")
+                response = requests.post(
+                    url="{}/crop_ontologies/".format(self.url_base),
+                    headers={"Accept": "application/json"},
+                    json=crop_ontologies,
+                )
+                if not response.ok:
+                    print(response.text())
+                trait_ontologies = trait_detail.pop("trait_ontologies")
+                trait_ontologies["crop_ontology_id"] = response.json()["id"]
+                response = requests.post(
+                    url="{}/trait_ontologies/".format(self.url_base),
+                    headers={"Accept": "application/json"},
+                    json=trait_ontologies,
+                )
+                if not response.ok:
+                    print(response.text())
+                variable_ontologies["trait_ontology_id"] = response.json()["id"]
+                traits = trait_detail.pop("traits")
+                response = requests.get(
+                    url="{}/traits/".format(self.url_base),
+                    headers={"Accept": "application/json"},
+                    params={"name": traits["name"]},
+                )
+                if not response.ok:
+                    print(response.text())
+                id = response.json()["id"]
+                traits["description"] = ""
+                traits["number"] = ""
+                response = requests.put(
+                    url="{}/traits/{}".format(self.url_base, id),
+                    headers={"Accept": "application/json"},
+                    json=traits,
+                )
+                if not response.ok:
+                    print(response.text())
+                variable_ontologies["trait_id"] = response.json()["id"]
+                method_ontologies = trait_detail.pop("method_ontologies")
+                if method_ontologies["formula"] is None:
+                    method_ontologies["formula"] = ""
+                response = requests.post(
+                    url="{}/method_ontologies/".format(self.url_base),
+                    headers={"Accept": "application/json"},
+                    json=method_ontologies,
+                )
+                if not response.ok:
+                    print(response.text())
+                variable_ontologies["method_ontology_id"] = response.json()["id"]
+
+                scale_ontologies = trait_detail.pop("scale_ontologies")
+                response = requests.post(
+                    url="{}/scale_ontologies/".format(self.url_base),
+                    headers={"Accept": "application/json"},
+                    json=scale_ontologies,
+                )
+                if not response.ok:
+                    print(response.text())
+                variable_ontologies["scale_ontology_id"] = response.json()["id"]
+
+                response = requests.post(
+                    url="{}/variable_ontologies/".format(self.url_base),
+                    headers={"Accept": "application/json"},
+                    json=variable_ontologies,
+                )
+                if not response.ok:
+                    print(response.text())

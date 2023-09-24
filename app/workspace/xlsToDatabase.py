@@ -60,26 +60,26 @@ def get_trait_details(path):
             if 'co_id' in dic_trait and dic_trait['co_id'] != '':
                 url = 'https://cropontology.org/brapi/v1/variables/%s' % dic_trait['co_id']
                 r = requests.get(url=url, headers={'Accept': 'application/json'})
-                dic_general['crop_ontologies'] = {'ontologyDbId': r.json()['result']['ontologyDbId'],
+                dic_general['crop_ontologies'] = {'ontology_db_id': r.json()['result']['ontologyDbId'],
                                                   "name": r.json()['result']['ontologyName']}
-                dic_general['trait_ontologies'] = {'traitDbId': r.json()['result']['trait']['traitDbId'],
+                dic_general['trait_ontologies'] = {'trait_db_id': r.json()['result']['trait']['traitDbId'],
                                                    "name": r.json()['result']['trait']['name'],
-                                                   "class": r.json()['result']['trait']['class'],
+                                                   "class_family": r.json()['result']['trait']['class'],
                                                    "description": r.json()['result']['trait']['description']}
-                dic_general['method_ontologies'] = {'methodDbId': r.json()['result']['method']['methodDbId'],
+                dic_general['method_ontologies'] = {'method_db_id': r.json()['result']['method']['methodDbId'],
                                                     "name": r.json()['result']['method']['name'],
-                                                    "class": r.json()['result']['method']['class'],
+                                                    "class_family": r.json()['result']['method']['class'],
                                                     "description": r.json()['result']['method']['description'],
                                                     "formula": r.json()['result']['method']['formula']}
-                dic_general['scale_ontologies'] = {'scaleDbId': r.json()['result']['scale']['scaleDbId'],
+                dic_general['scale_ontologies'] = {'scale_db_id': r.json()['result']['scale']['scaleDbId'],
                                                    "name": r.json()['result']['scale']['name'],
-                                                   "dataType": r.json()['result']['scale']['dataType'],
-                                                   "validValues": str(r.json()['result']['scale']['validValues'])}
+                                                   "data_type": r.json()['result']['scale']['dataType'],
+                                                   "valid_values": str(r.json()['result']['scale']['validValues'])}
                 dic_general['variable_ontologies'] = {
-                    'observationVariableDbId': r.json()['result']['observationVariableDbId'],
+                    'observation_variable_db_id': r.json()['result']['observationVariableDbId'],
                     "name": r.json()['result']['name'],
                     "synonyms": r.json()['result']['synonyms'],
-                    "growthStage": r.json()['result']['growthStage']}
+                    "growth_stage": r.json()['result']['growthStage']}
             entities.append(dic_general)
         return entities
     else:
