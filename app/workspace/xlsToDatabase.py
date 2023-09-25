@@ -1,10 +1,12 @@
-import os.path
+import os
 import pandas as pd
 import requests
+import re
 
 
-def get_locations(path):
-    file_name = rename_file_csv(path=path, source='51ST IDYN_Loc_data.xls', destiny='location.csv')
+def get_locations(path, list_csv_files):
+    source = search_file_by_regex(list_files=list_csv_files, end_with="Loc_data.xls")
+    file_name = rename_file_csv(path=path, source=source, destiny='location.csv')
     if os.path.isfile(file_name):
         csv_data = pd.read_csv(file_name, delimiter='\t', engine='python', header=None, )
         csv_dictionary = csv_data.to_dict('index')
@@ -14,8 +16,17 @@ def get_locations(path):
         raise FileNotFoundError('Filing to save file or not exist it')
 
 
-def get_genotypes(path):
-    file_name = rename_file_csv(path=path, source='51ST IDYN_Genotypes_Data.xls', destiny='genotypes.csv')
+def search_file_by_regex(list_files, end_with):
+    for file in list_files:
+        x = re.search("{}$".format(end_with), file)
+        if x:
+            return file
+    raise FileNotFoundError("Can not find the file to work - {}".format(end_with))
+
+
+def get_genotypes(path, list_csv_files):
+    source = search_file_by_regex(list_files=list_csv_files, end_with="Genotypes_Data.xls")
+    file_name = rename_file_csv(path=path, source=source, destiny='genotypes.csv')
     if os.path.isfile(file_name):
         csv_data = pd.read_csv(file_name, delimiter='\t', engine='python', header=None, encoding='ISO-8859-1')
         csv_dictionary = csv_data.to_dict('index')
@@ -25,8 +36,9 @@ def get_genotypes(path):
         raise FileNotFoundError('Filing to save file or not exist it')
 
 
-def get_raw_collections(path):
-    file_name = rename_file_csv(path=path, source='51ST IDYN_RawData.xls', destiny='raw.csv')
+def get_raw_collections(path, list_csv_files):
+    source = search_file_by_regex(list_files=list_csv_files, end_with="RawData.xls")
+    file_name = rename_file_csv(path=path, source=source, destiny='raw.csv')
     if os.path.isfile(file_name):
         csv_data = pd.read_csv(file_name, delimiter='\t', engine='python', header=None, encoding='ISO-8859-1')
         csv_dictionary = csv_data.to_dict('index')
@@ -36,8 +48,10 @@ def get_raw_collections(path):
         raise FileNotFoundError('Filing to save file or not exist it')
 
 
-def get_trait_details(path):
-    file_name = os.path.join(path, '51ST IDYN.xls')
+def get_trait_details(path, list_csv_files):
+    source = search_file_by_regex(list_files=list_csv_files, end_with="IDYN.xls")
+    print(source)
+    file_name = os.path.join(path, source)
     if os.path.isfile(file_name):
         csv_data = pd.read_excel(file_name, sheet_name=None)
         entities = []
