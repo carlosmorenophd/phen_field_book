@@ -2,6 +2,7 @@ import gzip
 import os
 import shutil
 from zipfile import ZipFile
+from pyunpack import Archive
 
 
 def unzip_file(source_file, destiny_folder):
@@ -20,4 +21,6 @@ def extract_all_gz(directory):
                     extract_path, "wb"
             ) as outfile:
                 shutil.copyfileobj(inFile, outfile)
-
+        if file.endswith(".7z"):
+            z_path = os.path.join(directory, file)
+            Archive(z_path).extractall(directory)

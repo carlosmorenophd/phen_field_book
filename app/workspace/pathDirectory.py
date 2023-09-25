@@ -19,6 +19,10 @@ class PathDirectory:
     def get_all_file_csv(self):
         return os.listdir(self.path_work)
 
+    def remove_file(self, file):
+        file_to_remove = os.path.join(self.path_files, file)
+        os.remove(file_to_remove)
+
     def get_file_from_file_directory(self, file):
         file_exist = os.path.join(self.path_files, file)
         if os.path.exists(file_exist):

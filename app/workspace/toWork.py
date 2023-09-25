@@ -30,6 +30,7 @@ class WorkSpace:
             self.prepare_folder_files(file_name=file)
             list_csv_files = self.path_directory.get_all_file_csv()
             self.storage_on_database(list_csv_files=list_csv_files)
+            self.path_directory.remove_file(file)
 
     def storage_on_database(self, list_csv_files):
         for location in get_locations(path=self.path_directory.get_work_directory(), list_csv_files=list_csv_files):
@@ -42,6 +43,8 @@ class WorkSpace:
             if not response.ok:
                 raise ConnectionError(response.text())
         for genotype in get_genotypes(path=self.path_directory.get_work_directory(), list_csv_files=list_csv_files):
+            if genotype["s_id"] == 114:
+                print(genotype)
             response = requests.post(
                 url="http://localhost:8000/genotypes",
                 headers={"Accept": "application/json"},
