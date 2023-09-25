@@ -16,11 +16,15 @@ def get_locations(path, list_csv_files):
         raise FileNotFoundError('Filing to save file or not exist it')
 
 
-def search_file_by_regex(list_files, end_with):
+def search_file_by_regex(list_files, end_with, end_with_double: str = ""):
     for file in list_files:
         x = re.search("{}$".format(end_with), file)
         if x:
             return file
+        if end_with_double != "":
+            x = re.search("{}$".format(end_with_double), file)
+            if x:
+                return file
     raise FileNotFoundError("Can not find the file to work - {}".format(end_with))
 
 
@@ -49,7 +53,7 @@ def get_raw_collections(path, list_csv_files):
 
 
 def get_trait_details(path, list_csv_files):
-    source = search_file_by_regex(list_files=list_csv_files, end_with="IDYN.xls")
+    source = search_file_by_regex(list_files=list_csv_files, end_with="IDYN.xls", end_with_double="IDYN.xlsx")
     print(source)
     file_name = os.path.join(path, source)
     if os.path.isfile(file_name):
