@@ -77,27 +77,28 @@ def get_trait_details(path, list_csv_files):
             dic_general["traits"] = dic_trait
             if 'co_id' in dic_trait and dic_trait['co_id'] != '':
                 url = 'https://cropontology.org/brapi/v1/variables/%s' % dic_trait['co_id']
-                r = requests.get(url=url, headers={'Accept': 'application/json'})
-                dic_general['crop_ontologies'] = {'ontology_db_id': r.json()['result']['ontologyDbId'],
-                                                  "name": r.json()['result']['ontologyName']}
-                dic_general['trait_ontologies'] = {'trait_db_id': r.json()['result']['trait']['traitDbId'],
-                                                   "name": r.json()['result']['trait']['name'],
-                                                   "class_family": r.json()['result']['trait']['class'],
-                                                   "description": r.json()['result']['trait']['description']}
-                dic_general['method_ontologies'] = {'method_db_id': r.json()['result']['method']['methodDbId'],
-                                                    "name": r.json()['result']['method']['name'],
-                                                    "class_family": r.json()['result']['method']['class'],
-                                                    "description": r.json()['result']['method']['description'],
-                                                    "formula": r.json()['result']['method']['formula']}
-                dic_general['scale_ontologies'] = {'scale_db_id': r.json()['result']['scale']['scaleDbId'],
-                                                   "name": r.json()['result']['scale']['name'],
-                                                   "data_type": r.json()['result']['scale']['dataType'],
-                                                   "valid_values": str(r.json()['result']['scale']['validValues'])}
-                dic_general['variable_ontologies'] = {
-                    'observation_variable_db_id': r.json()['result']['observationVariableDbId'],
-                    "name": r.json()['result']['name'],
-                    "synonyms": r.json()['result']['synonyms'],
-                    "growth_stage": r.json()['result']['growthStage']}
+                request = requests.get(url=url, headers={'Accept': 'application/json'})
+                if request.ok:
+                    dic_general['crop_ontologies'] = {'ontology_db_id': request.json()['result']['ontologyDbId'],
+                                                    "name": request.json()['result']['ontologyName']}
+                    dic_general['trait_ontologies'] = {'trait_db_id': request.json()['result']['trait']['traitDbId'],
+                                                    "name": request.json()['result']['trait']['name'],
+                                                    "class_family": request.json()['result']['trait']['class'],
+                                                    "description": request.json()['result']['trait']['description']}
+                    dic_general['method_ontologies'] = {'method_db_id': request.json()['result']['method']['methodDbId'],
+                                                        "name": request.json()['result']['method']['name'],
+                                                        "class_family": request.json()['result']['method']['class'],
+                                                        "description": request.json()['result']['method']['description'],
+                                                        "formula": request.json()['result']['method']['formula']}
+                    dic_general['scale_ontologies'] = {'scale_db_id': request.json()['result']['scale']['scaleDbId'],
+                                                    "name": request.json()['result']['scale']['name'],
+                                                    "data_type": request.json()['result']['scale']['dataType'],
+                                                    "valid_values": str(request.json()['result']['scale']['validValues'])}
+                    dic_general['variable_ontologies'] = {
+                        'observation_variable_db_id': request.json()['result']['observationVariableDbId'],
+                        "name": request.json()['result']['name'],
+                        "synonyms": request.json()['result']['synonyms'],
+                        "growth_stage": request.json()['result']['growthStage']}
             entities.append(dic_general)
         return entities
     else:
@@ -127,6 +128,14 @@ def rename_file_csv(path, source, destiny):
     return os.path.join(path, destiny)
 
 
+def convert(value, to, default):
+    if to == "int":
+        try:
+            return int(value)
+        except ValueError:
+            return default
+
+
 def convert_head_csv_to_column(entity, head_csv, value):
     if entity == 'locations':
         if head_csv == 'Loc_no':
@@ -142,17 +151,17 @@ def convert_head_csv_to_column(entity, head_csv, value):
         elif head_csv == 'Latitud':
             return {'name': 'latitude', 'value': str(value)}
         elif head_csv == 'Lat_degress':
-            return {'name': 'latitude_degrees', 'value': int(value)}
+            return {'name': 'latitude_degrees', 'value': convert(value=value, to="int", default=-500)}
         elif head_csv == 'Lat_minutes':
-            return {'name': 'latitude_minutes', 'value': int(value)}
+            return {'name': 'latitude_minutes', 'value': convert(value=value, to="int", default=-500)}
         elif head_csv == 'Longitude':
             return {'name': 'longitude', 'value': str(value)}
         elif head_csv == 'Long_degress':
-            return {'name': 'longitude_degrees', 'value': int(value)}
+            return {'name': 'longitude_degrees', 'value': convert(value=value, to="int", default=-500)}
         elif head_csv == 'Long_minutes':
-            return {'name': 'longitude_minutes', 'value': int(value)}
+            return {'name': 'longitude_minutes', 'value': convert(value=value, to="int", default=-500)}
         elif head_csv == 'Altitude':
-            return {'name': 'altitude', 'value': int(value)}
+            return {'name': 'altitude', 'value': convert(value=value, to="int", default=-500)}
         else:
             return {'name': 'None', 'value': 'None'}
     elif entity == 'genotypes':
