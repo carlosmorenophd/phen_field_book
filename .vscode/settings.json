@@ -1,10 +1,10 @@
 {
-<<<<<<< HEAD
     "cSpell.ignoreWords": [
         "backref",
         "dotenv",
         "fastapi",
-        "pydantic"
+        "pydantic",
+        "pyunpack"
     ],
     "cSpell.words": [
         "uvicorn"
@@ -12,7 +12,4 @@
     "workbench.colorCustomizations": {
         "activityBar.background": "#a5af9e"
     }
-=======
-
->>>>>>> develop
 }

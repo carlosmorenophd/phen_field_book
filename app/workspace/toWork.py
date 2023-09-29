@@ -24,8 +24,16 @@ class WorkSpace:
         unzip_file(source_file=source_file, destiny_folder=destiny_folder)
         extract_all_gz(destiny_folder)
 
-    def storage_on_database(self):
-        for location in get_locations(self.path_directory.get_work_directory()):
+    def work_with_all_zips(self):
+        for file in self.path_directory.get_all_files_zip():
+            self.clean_workspace()
+            self.prepare_folder_files(file_name=file)
+            list_csv_files = self.path_directory.get_all_file_csv()
+            self.storage_on_database(list_csv_files=list_csv_files)
+            self.path_directory.remove_file(file)
+
+    def storage_on_database(self, list_csv_files):
+        for location in get_locations(path=self.path_directory.get_work_directory(), list_csv_files=list_csv_files):
             url = "http://localhost:8000/locations"
             response = requests.post(
                 url=url,
@@ -33,18 +41,18 @@ class WorkSpace:
                 json=location,
             )
             if not response.ok:
-                print(response.text())
-        for genotype in get_genotypes(self.path_directory.get_work_directory()):
+                raise ConnectionError(response.text())
+        for genotype in get_genotypes(path=self.path_directory.get_work_directory(), list_csv_files=list_csv_files):
+            if genotype["s_id"] == 114:
+                print(genotype)
             response = requests.post(
                 url="http://localhost:8000/genotypes",
                 headers={"Accept": "application/json"},
                 json=genotype,
             )
             if not response.ok:
-                print(response.text())
-        for raw_collections in get_raw_collections(
-            self.path_directory.get_work_directory()
-        ):
+                raise ConnectionError(response.text())
+        for raw_collections in get_raw_collections(path=self.path_directory.get_work_directory(), list_csv_files=list_csv_files):
             trail = dict()
             trail["name"] = raw_collections.pop("trails.name")
             response = requests.post(
@@ -53,7 +61,7 @@ class WorkSpace:
                 json=trail,
             )
             if not response.ok:
-                print(response.text())
+                raise ConnectionError(response.text())
             raw_collections["trail_id"] = response.json()["id"]
             number = raw_collections.pop("locations.number")
             raw_collections.pop("locations.country")
@@ -64,7 +72,7 @@ class WorkSpace:
                 params={"number": int(number)},
             )
             if not response.ok:
-                print(response.text())
+                raise ConnectionError(response.text())
             raw_collections["location_id"] = response.json()["id"]
             ids = {
                 "c_id": raw_collections.pop("genotypes.c_id"),
@@ -77,7 +85,7 @@ class WorkSpace:
                 params=ids,
             )
             if not response.ok:
-                print(response.text())
+                raise ConnectionError(response.text())
             raw_collections["genotype_id"] = response.json()["id"]
             trait = {
                 "name": raw_collections.pop("traits.name"),
@@ -93,7 +101,7 @@ class WorkSpace:
                 json=trait,
             )
             if not response.ok:
-                print(response.text())
+                raise ConnectionError(response.text())
             raw_collections["trait_id"] = response.json()["id"]
 
             response = requests.post(
@@ -102,7 +110,7 @@ class WorkSpace:
                 json={"name": raw_collections.pop("units.name")},
             )
             if not response.ok:
-                print(response.text())
+                raise ConnectionError(response.text())
             raw_collections["unit_id"] = response.json()["id"]
 
             raw_collections["hash_raw"] = str(raw_collections.pop("hash"))
@@ -112,9 +120,8 @@ class WorkSpace:
                 json=raw_collections,
             )
             if not response.ok:
-                print(response.text())
-        for trait_detail in get_trait_details(self.path_directory.get_work_directory()):
-            print(trait_detail)
+                raise ConnectionError(response.text())
+        for trait_detail in get_trait_details(path=self.path_directory.get_work_directory(), list_csv_files=list_csv_files):
             if "variable_ontologies" in trait_detail:
                 variable_ontologies = trait_detail.pop("variable_ontologies")
                 crop_ontologies = trait_detail.pop("crop_ontologies")
@@ -124,7 +131,7 @@ class WorkSpace:
                     json=crop_ontologies,
                 )
                 if not response.ok:
-                    print(response.text())
+                    raise ConnectionError(response.text())
                 trait_ontologies = trait_detail.pop("trait_ontologies")
                 trait_ontologies["crop_ontology_id"] = response.json()["id"]
                 response = requests.post(
@@ -133,7 +140,7 @@ class WorkSpace:
                     json=trait_ontologies,
                 )
                 if not response.ok:
-                    print(response.text())
+                    raise ConnectionError(response.text())
                 variable_ontologies["trait_ontology_id"] = response.json()["id"]
                 traits = trait_detail.pop("traits")
                 response = requests.get(
@@ -142,7 +149,7 @@ class WorkSpace:
                     params={"name": traits["name"]},
                 )
                 if not response.ok:
-                    print(response.text())
+                    raise ConnectionError(response.text())
                 id = response.json()["id"]
                 traits["description"] = ""
                 traits["number"] = ""
@@ -152,7 +159,7 @@ class WorkSpace:
                     json=traits,
                 )
                 if not response.ok:
-                    print(response.text())
+                    raise ConnectionError(response.text())
                 variable_ontologies["trait_id"] = response.json()["id"]
                 method_ontologies = trait_detail.pop("method_ontologies")
                 if method_ontologies["formula"] is None:
@@ -163,7 +170,7 @@ class WorkSpace:
                     json=method_ontologies,
                 )
                 if not response.ok:
-                    print(response.text())
+                    raise ConnectionError(response.text())
                 variable_ontologies["method_ontology_id"] = response.json()["id"]
 
                 scale_ontologies = trait_detail.pop("scale_ontologies")
@@ -173,7 +180,7 @@ class WorkSpace:
                     json=scale_ontologies,
                 )
                 if not response.ok:
-                    print(response.text())
+                    raise ConnectionError(response.text())
                 variable_ontologies["scale_ontology_id"] = response.json()["id"]
 
                 response = requests.post(
@@ -182,4 +189,4 @@ class WorkSpace:
                     json=variable_ontologies,
                 )
                 if not response.ok:
-                    print(response.text())
+                    raise ConnectionError(response.text())
