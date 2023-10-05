@@ -34,6 +34,17 @@ def get_genotypes(path, list_csv_files):
         return get_dictionary_by_entity(entity='genotypes', head=head, csv_dictionary=csv_dictionary)
     else:
         raise FileNotFoundError('Filing to save file or not exist it')
+    
+def get_fields(path, list_csv_files):
+    source = search_file_by_regex(list_files=list_csv_files, end_with="EnvData.xls")
+    file_name = rename_file_csv(path=path, source=source, destiny='env_data.csv')
+    if os.path.isfile(file_name):
+        csv_data = pd.read_csv(file_name, delimiter='\t', engine='python', header=None, encoding='ISO-8859-1')
+        csv_dictionary = csv_data.to_dict('index')
+        head = csv_dictionary.pop(0)
+        return get_dictionary_by_entity(entity='env_data', head=head, csv_dictionary=csv_dictionary)
+    else:
+        raise FileNotFoundError('Filing - EnvData to save file or not exist it')
 
 
 def get_raw_collections(path, list_csv_files):
@@ -199,5 +210,33 @@ def convert_head_csv_to_column(entity, head_csv, value):
             return {'name': 'units.name', 'value': str(value)}
         else:
             return {'name': 'None', 'value': 'None'}
+    elif entity == 'env_data':
+        return convert_head_csv_to_column_env_data(head_csv, value)
     else:
         return {'name': 'None', 'value': 'None'}
+
+def convert_head_csv_to_column_env_data(head_csv, value):
+    if head_csv == 'Trial name':
+        return {"name": "trait.name", "value": str(value)}
+    elif head_csv == "Occ":
+        return {"name": "occurrence", "value": int(value)}
+    elif head_csv == "Loc_no":
+        return {"name": "location.number", "value": int(value)}
+    elif head_csv == "Country":
+        return {"name": "location.country", "value": int(value)}
+    elif head_csv == "Loc_desc":
+        return {"name": "description", "value": int(value)}
+    elif head_csv == "Cycle":
+        return {"name": "cycle_year", "value": str(value)}
+    elif head_csv == "Trait No":
+        return {"name": "environment_definition.number", "value": int(value)}
+    elif head_csv == "Trait name":
+        return {"name": "environment_definition.name", "value": str(value)}
+    elif head_csv == "Value":
+        return {"name": "value_data", "value": str(value)}
+    elif head_csv == "Unit":
+        return {"name": "unity.name", "value": str(value)}
+    else:
+        return {'name': 'None', 'value': 'None'}  									
+    
+    

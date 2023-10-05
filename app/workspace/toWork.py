@@ -7,6 +7,7 @@ from .xlsToDatabase import (
     get_locations,
     get_raw_collections,
     get_trait_details,
+    get_fields,
 )
 
 
@@ -43,8 +44,6 @@ class WorkSpace:
             if not response.ok:
                 raise ConnectionError(response.text())
         for genotype in get_genotypes(path=self.path_directory.get_work_directory(), list_csv_files=list_csv_files):
-            if genotype["s_id"] == 114:
-                print(genotype)
             response = requests.post(
                 url="http://localhost:8000/genotypes",
                 headers={"Accept": "application/json"},
@@ -52,6 +51,11 @@ class WorkSpace:
             )
             if not response.ok:
                 raise ConnectionError(response.text())
+        for field in get_fields(path=self.path_directory.get_work_directory(), list_csv_files=list_csv_files):
+            response = requests.post(
+                url="{}/"
+            )
+        
         for raw_collections in get_raw_collections(path=self.path_directory.get_work_directory(), list_csv_files=list_csv_files):
             trail = dict()
             trail["name"] = raw_collections.pop("trails.name")
