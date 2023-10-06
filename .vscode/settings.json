@@ -1,6 +1,8 @@
 {
     "cSpell.ignoreWords": [
+        "Latitud",
         "backref",
+        "degress",
         "dotenv",
         "fastapi",
         "pydantic",
