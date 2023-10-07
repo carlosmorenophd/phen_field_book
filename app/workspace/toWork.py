@@ -43,6 +43,10 @@ class WorkSpace:
             path=self.path_directory.get_work_directory(),
             list_csv_files=list_csv_files,
         ))
+        self.store_environments(environments=get_environments(
+            path=self.path_directory.get_work_directory(),
+            list_csv_files=list_csv_files
+        ))
         self.store_raw_collection(raw_collections=get_raw_collections(
             path=self.path_directory.get_work_directory(),
             list_csv_files=list_csv_files,
@@ -62,10 +66,9 @@ class WorkSpace:
             )
             if not response.ok:
                 raise ConnectionError(response.text())
-        for genotype in get_genotypes(
-            path=self.path_directory.get_work_directory(),
-            list_csv_files=list_csv_files
-        ):
+
+    def store_genotype(self, genotypes):
+        for genotype in genotypes:
             response = requests.post(
                 url="{}/genotypes".format(self.url_base),
                 headers={"Accept": "application/json"},
@@ -73,84 +76,23 @@ class WorkSpace:
             )
             if not response.ok:
                 raise ConnectionError(response.text())
-        for field in get_environments(
-            path=self.path_directory.get_work_directory(),
-            list_csv_files=list_csv_files
-        ):
+
+    def store_environments(self, environments):
+        for environment in environments:
             response = requests.post(
-                url="{}/field_collection_environment/xls".format(
+                url="{}/field_collection_environments/xls".format(
                     self.url_base),
                 headers={"Accept": "application/json"},
-                json=field,
+                json=environment,
             )
+            if not response.ok:
+                raise ConnectionError(response.text())
 
-        for raw_collections in get_raw_collections(
-            path=self.path_directory.get_work_directory(), 
-            list_csv_files=list_csv_files
-        ):
-            trail = dict()
-            trail["name"] = raw_collection.pop("trails.name")
-            response = requests.post(
-                url="{}/trails/".format(self.url_base),
-                headers={"Accept": "application/json"},
-                json=trail,
-            )
-            if not response.ok:
-                raise ConnectionError(response.text())
-            raw_collection["trail_id"] = response.json()["id"]
-            number = raw_collection.pop("locations.number")
-            raw_collection.pop("locations.country")
-            raw_collection.pop("locations.description")
-            response = requests.get(
-                url="{}/locations/".format(self.url_base),
-                headers={"Accept": "application/json"},
-                params={"number": int(number)},
-            )
-            if not response.ok:
-                raise ConnectionError(response.text())
-            raw_collection["location_id"] = response.json()["id"]
-            ids = {
-                "c_id": raw_collection.pop("genotypes.c_id"),
-                "s_id": raw_collection.pop("genotypes.s_id"),
-            }
-            raw_collection.pop("genotypes.cross_name")
-            response = requests.get(
-                url="{}/genotypes/".format(self.url_base),
-                headers={"Accept": "application/json"},
-                params=ids,
-            )
-            if not response.ok:
-                raise ConnectionError(response.text())
-            raw_collection["genotype_id"] = response.json()["id"]
-            trait = {
-                "name": raw_collection.pop("traits.name"),
-                "number": raw_collection.pop("traits.trait_number"),
-                "description": "",
-                "co_trait_name": "",
-                "variable_name": "",
-                "co_id": "",
-            }
-            response = requests.post(
-                url="{}/traits/".format(self.url_base),
-                headers={"Accept": "application/json"},
-                json=trait,
-            )
-            if not response.ok:
-                raise ConnectionError(response.text())
-            raw_collection["trait_id"] = response.json()["id"]
-
-            response = requests.post(
-                url="{}/units/".format(self.url_base),
-                headers={"Accept": "application/json"},
-                json={"name": raw_collection.pop("units.name")},
-            )
-            if not response.ok:
-                raise ConnectionError(response.text())
-            raw_collection["unit_id"] = response.json()["id"]
-
+    def store_raw_collection(self, raw_collections):
+        for raw_collection in raw_collections:
             raw_collection["hash_raw"] = str(raw_collection.pop("hash"))
             response = requests.post(
-                url="{}/raw_collections/".format(self.url_base),
+                url="{}/raw_collections/xls".format(self.url_base),
                 headers={"Accept": "application/json"},
                 json=raw_collection,
             )

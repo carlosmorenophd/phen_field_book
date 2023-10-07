@@ -57,7 +57,8 @@ def get_genotypes(path, list_csv_files):
 
 def get_environments(path, list_csv_files):
     source = search_file_by_regex(
-        list_files=list_csv_files, end_with="EnvData.xls")
+        list_files=list_csv_files, end_with="_EnvData.xls")
+    web_file = source.replace("_EnvData.xls", "")
     file_name = rename_file_csv(
         path=path, source=source, destiny='env_data.csv')
     if os.path.isfile(file_name):
@@ -72,7 +73,8 @@ def get_environments(path, list_csv_files):
         return get_dictionary_by_entity(
             entity='env_data',
             head=head,
-            csv_dictionary=csv_dictionary
+            csv_dictionary=csv_dictionary,
+            static_row={"web_file_name": web_file},
         )
     else:
         raise FileNotFoundError(
@@ -81,14 +83,27 @@ def get_environments(path, list_csv_files):
 
 def get_raw_collections(path, list_csv_files):
     source = search_file_by_regex(
-        list_files=list_csv_files, end_with="RawData.xls")
+        list_files=list_csv_files,
+        end_with="_RawData.xls"
+    )
+    web_file = source.replace("_RawData.xls", "")
     file_name = rename_file_csv(path=path, source=source, destiny='raw.csv')
     if os.path.isfile(file_name):
         csv_data = pd.read_csv(
-            file_name, delimiter='\t', engine='python', header=None, encoding='ISO-8859-1')
+            file_name, delimiter='\t',
+            engine='python',
+            header=None,
+            encoding='ISO-8859-1'
+        )
         csv_dictionary = csv_data.to_dict('index')
         head = csv_dictionary.pop(0)
-        return get_dictionary_by_entity(entity='raw_collections', head=head, csv_dictionary=csv_dictionary, add_hash=True)
+        return get_dictionary_by_entity(
+            entity='raw_collections',
+            head=head,
+            csv_dictionary=csv_dictionary,
+            add_hash=True,
+            static_row={"web_file_name": web_file},
+        )
     else:
         raise FileNotFoundError('Filing to save file or not exist it')
 
@@ -153,20 +168,29 @@ def get_trait_details(path, list_csv_files):
         raise FileNotFoundError('Filing to save file or not exist it')
 
 
-def get_dictionary_by_entity(entity, head, csv_dictionary, add_hash: bool = False):
+def get_dictionary_by_entity(
+    entity,
+    head,
+    csv_dictionary,
+    add_hash: bool = False,
+    static_row: dict = None,
+):
     array_dictionary = []
     for key in csv_dictionary:
         dictionary_to_save = {}
         for head_key in head:
-            column = convert_head_csv_to_column(entity, head_csv=head[head_key],
-                                                value=csv_dictionary[key][head_key])
+            column = convert_head_csv_to_column(
+                entity, head_csv=head[head_key],
+                value=csv_dictionary[key][head_key]
+            )
             if column['name'] != 'None':
                 dictionary_to_save[column['name']] = column['value']
         if add_hash:
             create_hash = hash(frozenset(csv_dictionary[key].items()))
-            # print (create_hash.items())
-            # print(hash(frozenset(create_hash.items())))
             dictionary_to_save['hash'] = create_hash
+        if static_row:
+            for key in static_row:
+                dictionary_to_save[key] = static_row[key]
         array_dictionary.append(dictionary_to_save)
     return array_dictionary
 
@@ -224,49 +248,14 @@ def convert_head_csv_to_column(entity, head_csv, value):
         else:
             return {'name': 'None', 'value': 'None'}
     elif entity == 'raw_collections':
-        if head_csv == 'Trial name':
-            return {'name': 'trails.name', 'value': str(value)}
-        elif head_csv == 'Occ':
-            return {'name': 'occurrence', 'value': int(value)}
-        elif head_csv == 'Loc_no':
-            return {'name': 'locations.number', 'value': int(value)}
-        elif head_csv == 'Country':
-            return {'name': 'locations.country', 'value': str(value)}
-        elif head_csv == 'Loc_desc':
-            return {'name': 'locations.description', 'value': str(value)}
-        elif head_csv == 'Cycle':
-            return {'name': 'cycle', 'value': str(value)}
-        elif head_csv == 'Cid':
-            return {'name': 'genotypes.c_id', 'value': str(value)}
-        elif head_csv == 'Sid':
-            return {'name': 'genotypes.s_id', 'value': str(value)}
-        elif head_csv == 'Gen_name':
-            return {'name': 'genotypes.cross_name', 'value': str(value)}
-        elif head_csv == 'Trait No':
-            return {'name': 'traits.trait_number', 'value': str(value)}
-        elif head_csv == 'Trait name':
-            return {'name': 'traits.name', 'value': str(value)}
-        elif head_csv == 'Gen_no':
-            return {'name': 'gen_number', 'value': int(value)}
-        elif head_csv == 'Rep':
-            return {'name': 'repetition', 'value': int(value)}
-        elif head_csv == 'Sub_block':
-            return {'name': 'sub_block', 'value': int(value)}
-        elif head_csv == 'Plot':
-            return {'name': 'plot', 'value': int(value)}
-        elif head_csv == 'Value':
-            return {'name': 'value_data', 'value': str(value)}
-        elif head_csv == 'Unit':
-            return {'name': 'units.name', 'value': str(value)}
-        else:
-            return {'name': 'None', 'value': 'None'}
+        return head_csv_raw_collection(head_csv, value)
     elif entity == 'env_data':
-        return convert_head_csv_to_column_env_data(head_csv, value)
+        return head_csv_env_data(head_csv, value)
     else:
         return {'name': 'None', 'value': 'None'}
 
 
-def convert_head_csv_to_column_env_data(head_csv, value):
+def head_csv_env_data(head_csv, value):
     if head_csv == 'Trial name':
         return {"name": "trial_name", "value": str(value)}
     elif head_csv == "Occ":
@@ -274,18 +263,57 @@ def convert_head_csv_to_column_env_data(head_csv, value):
     elif head_csv == "Loc_no":
         return {"name": "location_number", "value": int(value)}
     elif head_csv == "Country":
-        return {"name": "location_country", "value": int(value)}
+        return {"name": "location_country", "value": str(value)}
     elif head_csv == "Loc_desc":
-        return {"name": "description", "value": int(value)}
+        return {"name": "description", "value": str(value)}
     elif head_csv == "Cycle":
         return {"name": "agricultural_cycle", "value": str(value)}
     elif head_csv == "Trait No":
-        return {"name": "trait_number", "value": int(value)}
+        return {"name": "trait_number", "value": str(value)}
     elif head_csv == "Trait name":
         return {"name": "trait_name", "value": str(value)}
     elif head_csv == "Value":
         return {"name": "value_data", "value": str(value)}
     elif head_csv == "Unit":
         return {"name": "unit_name", "value": str(value)}
+    else:
+        return {'name': 'None', 'value': 'None'}
+
+
+def head_csv_raw_collection(head_csv, value):
+    if head_csv == 'Trial name':
+        return {'name': 'trial_name', 'value': str(value)}
+    elif head_csv == 'Occ':
+        return {'name': 'field_occurrence', 'value': int(value)}
+    elif head_csv == 'Loc_no':
+        return {'name': 'location_number', 'value': int(value)}
+    elif head_csv == 'Country':
+        return {'name': 'location_country', 'value': str(value)}
+    elif head_csv == 'Loc_desc':
+        return {'name': 'field_description', 'value': str(value)}
+    elif head_csv == 'Cycle':
+        return {'name': 'field_agricultural_cycle', 'value': str(value)}
+    elif head_csv == 'Cid':
+        return {'name': 'genotype_c_id', 'value': int(value)}
+    elif head_csv == 'Sid':
+        return {'name': 'genotype_s_id', 'value': int(value)}
+    elif head_csv == 'Gen_name':
+        return {'name': 'genotype_name', 'value': str(value)}
+    elif head_csv == 'Trait No':
+        return {'name': 'trait_number', 'value': str(value)}
+    elif head_csv == 'Trait name':
+        return {'name': 'trait_name', 'value': str(value)}
+    elif head_csv == 'Gen_no':
+        return {'name': 'genotype_number', 'value': int(value)}
+    elif head_csv == 'Rep':
+        return {'name': 'repetition', 'value': int(value)}
+    elif head_csv == 'Sub_block':
+        return {'name': 'sub_block', 'value': int(value)}
+    elif head_csv == 'Plot':
+        return {'name': 'plot', 'value': int(value)}
+    elif head_csv == 'Value':
+        return {'name': 'value_data', 'value': str(value)}
+    elif head_csv == 'Unit':
+        return {'name': 'unit_name', 'value': str(value)}
     else:
         return {'name': 'None', 'value': 'None'}
