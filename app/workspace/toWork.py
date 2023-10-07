@@ -7,7 +7,7 @@ from .xlsToDatabase import (
     get_locations,
     get_raw_collections,
     get_trait_details,
-    get_fields,
+    get_environments,
 )
 
 
@@ -20,7 +20,8 @@ class WorkSpace:
         self.path_directory.clean_work_directory()
 
     def prepare_folder_files(self, file_name):
-        source_file = self.path_directory.get_file_from_file_directory(file=file_name)
+        source_file = self.path_directory.get_file_from_file_directory(
+            file=file_name)
         destiny_folder = self.path_directory.get_work_directory()
         unzip_file(source_file=source_file, destiny_folder=destiny_folder)
         extract_all_gz(destiny_folder)
@@ -37,19 +38,19 @@ class WorkSpace:
         self.store_location(locations=get_locations(
             path=self.path_directory.get_work_directory(),
             list_csv_files=list_csv_files,
-            ))
+        ))
         self.store_genotype(genotypes=get_genotypes(
             path=self.path_directory.get_work_directory(),
             list_csv_files=list_csv_files,
-            ))
+        ))
         self.store_raw_collection(raw_collections=get_raw_collections(
             path=self.path_directory.get_work_directory(),
             list_csv_files=list_csv_files,
-            ))
+        ))
         self.store_trait_detail(trait_details=get_trait_details(
             path=self.path_directory.get_work_directory(),
             list_csv_files=list_csv_files,
-            ))
+        ))
 
     def store_location(self, locations):
         for location in locations:
@@ -61,7 +62,10 @@ class WorkSpace:
             )
             if not response.ok:
                 raise ConnectionError(response.text())
-        for genotype in get_genotypes(path=self.path_directory.get_work_directory(), list_csv_files=list_csv_files):
+        for genotype in get_genotypes(
+            path=self.path_directory.get_work_directory(),
+            list_csv_files=list_csv_files
+        ):
             response = requests.post(
                 url="{}/genotypes".format(self.url_base),
                 headers={"Accept": "application/json"},
@@ -69,12 +73,21 @@ class WorkSpace:
             )
             if not response.ok:
                 raise ConnectionError(response.text())
-        for field in get_fields(path=self.path_directory.get_work_directory(), list_csv_files=list_csv_files):
+        for field in get_environments(
+            path=self.path_directory.get_work_directory(),
+            list_csv_files=list_csv_files
+        ):
             response = requests.post(
-                url="{}/"
+                url="{}/field_collection_environment/xls".format(
+                    self.url_base),
+                headers={"Accept": "application/json"},
+                json=field,
             )
-        
-        for raw_collections in get_raw_collections(path=self.path_directory.get_work_directory(), list_csv_files=list_csv_files):
+
+        for raw_collections in get_raw_collections(
+            path=self.path_directory.get_work_directory(), 
+            list_csv_files=list_csv_files
+        ):
             trail = dict()
             trail["name"] = raw_collection.pop("trails.name")
             response = requests.post(
@@ -165,7 +178,8 @@ class WorkSpace:
                 )
                 if not response.ok:
                     raise ConnectionError(response.text())
-                variable_ontologies["trait_ontology_id"] = response.json()["id"]
+                variable_ontologies["trait_ontology_id"] = response.json()[
+                    "id"]
                 traits = trait_detail.pop("traits")
                 response = requests.get(
                     url="{}/traits/".format(self.url_base),
@@ -195,7 +209,8 @@ class WorkSpace:
                 )
                 if not response.ok:
                     raise ConnectionError(response.text())
-                variable_ontologies["method_ontology_id"] = response.json()["id"]
+                variable_ontologies["method_ontology_id"] = response.json()[
+                    "id"]
 
                 scale_ontologies = trait_detail.pop("scale_ontologies")
                 response = requests.post(
@@ -205,7 +220,8 @@ class WorkSpace:
                 )
                 if not response.ok:
                     raise ConnectionError(response.text())
-                variable_ontologies["scale_ontology_id"] = response.json()["id"]
+                variable_ontologies["scale_ontology_id"] = response.json()[
+                    "id"]
 
                 response = requests.post(
                     url="{}/variable_ontologies/".format(self.url_base),

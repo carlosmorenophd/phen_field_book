@@ -5,10 +5,13 @@ import re
 
 
 def get_locations(path, list_csv_files):
-    source = search_file_by_regex(list_files=list_csv_files, end_with="Loc_data.xls")
-    file_name = rename_file_csv(path=path, source=source, destiny='location.csv')
+    source = search_file_by_regex(
+        list_files=list_csv_files, end_with="Loc_data.xls")
+    file_name = rename_file_csv(
+        path=path, source=source, destiny='location.csv')
     if os.path.isfile(file_name):
-        csv_data = pd.read_csv(file_name, delimiter='\t', engine='python', header=None, )
+        csv_data = pd.read_csv(file_name, delimiter='\t',
+                               engine='python', header=None, )
         csv_dictionary = csv_data.to_dict('index')
         head = csv_dictionary.pop(0)
         return get_dictionary_by_entity(entity='locations', head=head, csv_dictionary=csv_dictionary)
@@ -25,37 +28,64 @@ def search_file_by_regex(list_files, end_with, end_with_double: str = ""):
             x = re.search("{}$".format(end_with_double), file)
             if x:
                 return file
-    raise FileNotFoundError("Can not find the file to work - {}".format(end_with))
+    raise FileNotFoundError(
+        "Can not find the file to work - {}".format(end_with))
 
 
 def get_genotypes(path, list_csv_files):
-    source = search_file_by_regex(list_files=list_csv_files, end_with="Genotypes_Data.xls")
-    file_name = rename_file_csv(path=path, source=source, destiny='genotypes.csv')
+    source = search_file_by_regex(
+        list_files=list_csv_files, end_with="Genotypes_Data.xls")
+    file_name = rename_file_csv(
+        path=path, source=source, destiny='genotypes.csv')
     if os.path.isfile(file_name):
-        csv_data = pd.read_csv(file_name, delimiter='\t', engine='python', header=None, encoding='ISO-8859-1')
+        csv_data = pd.read_csv(
+            file_name, delimiter='\t',
+            engine='python',
+            header=None,
+            encoding='ISO-8859-1'
+        )
         csv_dictionary = csv_data.to_dict('index')
         head = csv_dictionary.pop(0)
-        return get_dictionary_by_entity(entity='genotypes', head=head, csv_dictionary=csv_dictionary)
+        return get_dictionary_by_entity(
+            entity='genotypes',
+            head=head,
+            csv_dictionary=csv_dictionary
+        )
     else:
         raise FileNotFoundError('Filing to save file or not exist it')
-    
-def get_fields(path, list_csv_files):
-    source = search_file_by_regex(list_files=list_csv_files, end_with="EnvData.xls")
-    file_name = rename_file_csv(path=path, source=source, destiny='env_data.csv')
+
+
+def get_environments(path, list_csv_files):
+    source = search_file_by_regex(
+        list_files=list_csv_files, end_with="EnvData.xls")
+    file_name = rename_file_csv(
+        path=path, source=source, destiny='env_data.csv')
     if os.path.isfile(file_name):
-        csv_data = pd.read_csv(file_name, delimiter='\t', engine='python', header=None, encoding='ISO-8859-1')
+        csv_data = pd.read_csv(
+            file_name, delimiter='\t',
+            engine='python',
+            header=None,
+            encoding='ISO-8859-1'
+        )
         csv_dictionary = csv_data.to_dict('index')
         head = csv_dictionary.pop(0)
-        return get_dictionary_by_entity(entity='env_data', head=head, csv_dictionary=csv_dictionary)
+        return get_dictionary_by_entity(
+            entity='env_data',
+            head=head,
+            csv_dictionary=csv_dictionary
+        )
     else:
-        raise FileNotFoundError('Filing - EnvData to save file or not exist it')
+        raise FileNotFoundError(
+            'Filing - EnvData to save file or not exist it')
 
 
 def get_raw_collections(path, list_csv_files):
-    source = search_file_by_regex(list_files=list_csv_files, end_with="RawData.xls")
+    source = search_file_by_regex(
+        list_files=list_csv_files, end_with="RawData.xls")
     file_name = rename_file_csv(path=path, source=source, destiny='raw.csv')
     if os.path.isfile(file_name):
-        csv_data = pd.read_csv(file_name, delimiter='\t', engine='python', header=None, encoding='ISO-8859-1')
+        csv_data = pd.read_csv(
+            file_name, delimiter='\t', engine='python', header=None, encoding='ISO-8859-1')
         csv_dictionary = csv_data.to_dict('index')
         head = csv_dictionary.pop(0)
         return get_dictionary_by_entity(entity='raw_collections', head=head, csv_dictionary=csv_dictionary, add_hash=True)
@@ -64,7 +94,8 @@ def get_raw_collections(path, list_csv_files):
 
 
 def get_trait_details(path, list_csv_files):
-    source = search_file_by_regex(list_files=list_csv_files, end_with="IDYN.xls", end_with_double="IDYN.xlsx")
+    source = search_file_by_regex(
+        list_files=list_csv_files, end_with="IDYN.xls", end_with_double="IDYN.xlsx")
     print(source)
     file_name = os.path.join(path, source)
     if os.path.isfile(file_name):
@@ -80,31 +111,37 @@ def get_trait_details(path, list_csv_files):
                 else:
                     dic_trait['name'] = str_temp.strip()
             if ':' in csv_data[key].iloc[3, 3]:
-                dic_trait['co_trait_name'] = csv_data[key].iloc[3, 3].split(':')[1].strip()
+                dic_trait['co_trait_name'] = csv_data[key].iloc[3, 3].split(':')[
+                    1].strip()
             if ':' in csv_data[key].iloc[4, 3]:
-                dic_trait['variable_name'] = csv_data[key].iloc[4, 3].split(':')[1].strip()
+                dic_trait['variable_name'] = csv_data[key].iloc[4, 3].split(':')[
+                    1].strip()
             if ' : ' in csv_data[key].iloc[5, 3]:
-                dic_trait['co_id'] = csv_data[key].iloc[5, 3].split(' : ')[1].strip()
+                dic_trait['co_id'] = csv_data[key].iloc[5, 3].split(' : ')[
+                    1].strip()
             dic_general["traits"] = dic_trait
             if 'co_id' in dic_trait and dic_trait['co_id'] != '':
                 url = 'https://cropontology.org/brapi/v1/variables/%s' % dic_trait['co_id']
-                request = requests.get(url=url, headers={'Accept': 'application/json'})
+                request = requests.get(
+                    url=url, headers={'Accept': 'application/json'})
                 if request.ok:
-                    dic_general['crop_ontologies'] = {'ontology_db_id': request.json()['result']['ontologyDbId'],
-                                                    "name": request.json()['result']['ontologyName']}
+                    dic_general['crop_ontologies'] = {
+                        'ontology_db_id': request.json()['result']['ontologyDbId'],
+                        "name": request.json()['result']['ontologyName']
+                    }
                     dic_general['trait_ontologies'] = {'trait_db_id': request.json()['result']['trait']['traitDbId'],
-                                                    "name": request.json()['result']['trait']['name'],
-                                                    "class_family": request.json()['result']['trait']['class'],
-                                                    "description": request.json()['result']['trait']['description']}
+                                                       "name": request.json()['result']['trait']['name'],
+                                                       "class_family": request.json()['result']['trait']['class'],
+                                                       "description": request.json()['result']['trait']['description']}
                     dic_general['method_ontologies'] = {'method_db_id': request.json()['result']['method']['methodDbId'],
                                                         "name": request.json()['result']['method']['name'],
                                                         "class_family": request.json()['result']['method']['class'],
                                                         "description": request.json()['result']['method']['description'],
                                                         "formula": request.json()['result']['method']['formula']}
                     dic_general['scale_ontologies'] = {'scale_db_id': request.json()['result']['scale']['scaleDbId'],
-                                                    "name": request.json()['result']['scale']['name'],
-                                                    "data_type": request.json()['result']['scale']['dataType'],
-                                                    "valid_values": str(request.json()['result']['scale']['validValues'])}
+                                                       "name": request.json()['result']['scale']['name'],
+                                                       "data_type": request.json()['result']['scale']['dataType'],
+                                                       "valid_values": str(request.json()['result']['scale']['validValues'])}
                     dic_general['variable_ontologies'] = {
                         'observation_variable_db_id': request.json()['result']['observationVariableDbId'],
                         "name": request.json()['result']['name'],
@@ -116,7 +153,7 @@ def get_trait_details(path, list_csv_files):
         raise FileNotFoundError('Filing to save file or not exist it')
 
 
-def get_dictionary_by_entity(entity, head, csv_dictionary, add_hash: bool = False ):
+def get_dictionary_by_entity(entity, head, csv_dictionary, add_hash: bool = False):
     array_dictionary = []
     for key in csv_dictionary:
         dictionary_to_save = {}
@@ -228,28 +265,27 @@ def convert_head_csv_to_column(entity, head_csv, value):
     else:
         return {'name': 'None', 'value': 'None'}
 
+
 def convert_head_csv_to_column_env_data(head_csv, value):
     if head_csv == 'Trial name':
-        return {"name": "trait.name", "value": str(value)}
+        return {"name": "trial_name", "value": str(value)}
     elif head_csv == "Occ":
         return {"name": "occurrence", "value": int(value)}
     elif head_csv == "Loc_no":
-        return {"name": "location.number", "value": int(value)}
+        return {"name": "location_number", "value": int(value)}
     elif head_csv == "Country":
-        return {"name": "location.country", "value": int(value)}
+        return {"name": "location_country", "value": int(value)}
     elif head_csv == "Loc_desc":
         return {"name": "description", "value": int(value)}
     elif head_csv == "Cycle":
-        return {"name": "cycle_year", "value": str(value)}
+        return {"name": "agricultural_cycle", "value": str(value)}
     elif head_csv == "Trait No":
-        return {"name": "environment_definition.number", "value": int(value)}
+        return {"name": "trait_number", "value": int(value)}
     elif head_csv == "Trait name":
-        return {"name": "environment_definition.name", "value": str(value)}
+        return {"name": "trait_name", "value": str(value)}
     elif head_csv == "Value":
         return {"name": "value_data", "value": str(value)}
     elif head_csv == "Unit":
-        return {"name": "unity.name", "value": str(value)}
+        return {"name": "unit_name", "value": str(value)}
     else:
-        return {'name': 'None', 'value': 'None'}  									
-    
-    
+        return {'name': 'None', 'value': 'None'}
