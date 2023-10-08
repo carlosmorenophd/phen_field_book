@@ -2,7 +2,7 @@ from workspace.toWork import WorkSpace
 
 
 def run_project():
-    work_space = WorkSpace("/home/yeiden/Downloads/wirk/")
+    work_space = WorkSpace("/home/ubuntu/Documents/wirk/")
     work_space.work_with_all_zips()
     # work_space.clean_workspace()
     # work_space.prepare_folder_files("dataverse_files.zip")

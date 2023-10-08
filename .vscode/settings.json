@@ -1,8 +1,12 @@
 {
     "cSpell.ignoreWords": [
+        "Latitud",
         "backref",
+        "degress",
         "dotenv",
         "fastapi",
+        "iloc",
+        "pandas",
         "pydantic",
         "pyunpack"
     ],
@@ -10,6 +14,10 @@
         "uvicorn"
     ],
     "workbench.colorCustomizations": {
-        "activityBar.background": "#a5af9e"
-    }
+        "activityBar.background": "#576150"
+    },
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.autopep8"
+    },
+    "python.formatting.provider": "none"
 }
