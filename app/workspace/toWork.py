@@ -7,6 +7,7 @@ from .xlsToDatabase import (
     get_locations,
     get_raw_collections,
     get_trait_details,
+    get_environments,
 )
 
 
@@ -19,7 +20,8 @@ class WorkSpace:
         self.path_directory.clean_work_directory()
 
     def prepare_folder_files(self, file_name):
-        source_file = self.path_directory.get_file_from_file_directory(file=file_name)
+        source_file = self.path_directory.get_file_from_file_directory(
+            file=file_name)
         destiny_folder = self.path_directory.get_work_directory()
         unzip_file(source_file=source_file, destiny_folder=destiny_folder)
         extract_all_gz(destiny_folder)
@@ -33,8 +35,30 @@ class WorkSpace:
             self.path_directory.remove_file(file)
 
     def storage_on_database(self, list_csv_files):
-        for location in get_locations(path=self.path_directory.get_work_directory(), list_csv_files=list_csv_files):
-            url = "http://localhost:8000/locations"
+        self.store_location(locations=get_locations(
+            path=self.path_directory.get_work_directory(),
+            list_csv_files=list_csv_files,
+        ))
+        self.store_genotype(genotypes=get_genotypes(
+            path=self.path_directory.get_work_directory(),
+            list_csv_files=list_csv_files,
+        ))
+        self.store_environments(environments=get_environments(
+            path=self.path_directory.get_work_directory(),
+            list_csv_files=list_csv_files
+        ))
+        self.store_raw_collection(raw_collections=get_raw_collections(
+            path=self.path_directory.get_work_directory(),
+            list_csv_files=list_csv_files,
+        ))
+        self.store_trait_detail(trait_details=get_trait_details(
+            path=self.path_directory.get_work_directory(),
+            list_csv_files=list_csv_files,
+        ))
+
+    def store_location(self, locations):
+        for location in locations:
+            url = "{}/locations".format(self.url_base)
             response = requests.post(
                 url=url,
                 headers={"Accept": "application/json"},
@@ -42,86 +66,41 @@ class WorkSpace:
             )
             if not response.ok:
                 raise ConnectionError(response.text())
-        for genotype in get_genotypes(path=self.path_directory.get_work_directory(), list_csv_files=list_csv_files):
-            if genotype["s_id"] == 114:
-                print(genotype)
+
+    def store_genotype(self, genotypes):
+        for genotype in genotypes:
             response = requests.post(
-                url="http://localhost:8000/genotypes",
+                url="{}/genotypes".format(self.url_base),
                 headers={"Accept": "application/json"},
                 json=genotype,
             )
             if not response.ok:
                 raise ConnectionError(response.text())
-        for raw_collections in get_raw_collections(path=self.path_directory.get_work_directory(), list_csv_files=list_csv_files):
-            trail = dict()
-            trail["name"] = raw_collections.pop("trails.name")
-            response = requests.post(
-                url="http://localhost:8000/trails/",
-                headers={"Accept": "application/json"},
-                json=trail,
-            )
-            if not response.ok:
-                raise ConnectionError(response.text())
-            raw_collections["trail_id"] = response.json()["id"]
-            number = raw_collections.pop("locations.number")
-            raw_collections.pop("locations.country")
-            raw_collections.pop("locations.description")
-            response = requests.get(
-                url="http://localhost:8000/locations/",
-                headers={"Accept": "application/json"},
-                params={"number": int(number)},
-            )
-            if not response.ok:
-                raise ConnectionError(response.text())
-            raw_collections["location_id"] = response.json()["id"]
-            ids = {
-                "c_id": raw_collections.pop("genotypes.c_id"),
-                "s_id": raw_collections.pop("genotypes.s_id"),
-            }
-            raw_collections.pop("genotypes.cross_name")
-            response = requests.get(
-                url="http://localhost:8000/genotypes/",
-                headers={"Accept": "application/json"},
-                params=ids,
-            )
-            if not response.ok:
-                raise ConnectionError(response.text())
-            raw_collections["genotype_id"] = response.json()["id"]
-            trait = {
-                "name": raw_collections.pop("traits.name"),
-                "number": raw_collections.pop("traits.trait_number"),
-                "description": "",
-                "co_trait_name": "",
-                "variable_name": "",
-                "co_id": "",
-            }
-            response = requests.post(
-                url="http://localhost:8000/traits/",
-                headers={"Accept": "application/json"},
-                json=trait,
-            )
-            if not response.ok:
-                raise ConnectionError(response.text())
-            raw_collections["trait_id"] = response.json()["id"]
 
+    def store_environments(self, environments):
+        for environment in environments:
             response = requests.post(
-                url="http://localhost:8000/units/",
+                url="{}/field_collection_environments/xls".format(
+                    self.url_base),
                 headers={"Accept": "application/json"},
-                json={"name": raw_collections.pop("units.name")},
+                json=environment,
             )
             if not response.ok:
                 raise ConnectionError(response.text())
-            raw_collections["unit_id"] = response.json()["id"]
 
-            raw_collections["hash_raw"] = str(raw_collections.pop("hash"))
+    def store_raw_collection(self, raw_collections):
+        for raw_collection in raw_collections:
+            raw_collection["hash_raw"] = str(raw_collection.pop("hash"))
             response = requests.post(
-                url="http://localhost:8000/raw_collections/",
+                url="{}/raw_collections/xls".format(self.url_base),
                 headers={"Accept": "application/json"},
-                json=raw_collections,
+                json=raw_collection,
             )
             if not response.ok:
                 raise ConnectionError(response.text())
-        for trait_detail in get_trait_details(path=self.path_directory.get_work_directory(), list_csv_files=list_csv_files):
+
+    def store_trait_detail(self, trait_details):
+        for trait_detail in trait_details:
             if "variable_ontologies" in trait_detail:
                 variable_ontologies = trait_detail.pop("variable_ontologies")
                 crop_ontologies = trait_detail.pop("crop_ontologies")
@@ -141,7 +120,8 @@ class WorkSpace:
                 )
                 if not response.ok:
                     raise ConnectionError(response.text())
-                variable_ontologies["trait_ontology_id"] = response.json()["id"]
+                variable_ontologies["trait_ontology_id"] = response.json()[
+                    "id"]
                 traits = trait_detail.pop("traits")
                 response = requests.get(
                     url="{}/traits/".format(self.url_base),
@@ -171,7 +151,8 @@ class WorkSpace:
                 )
                 if not response.ok:
                     raise ConnectionError(response.text())
-                variable_ontologies["method_ontology_id"] = response.json()["id"]
+                variable_ontologies["method_ontology_id"] = response.json()[
+                    "id"]
 
                 scale_ontologies = trait_detail.pop("scale_ontologies")
                 response = requests.post(
@@ -181,7 +162,8 @@ class WorkSpace:
                 )
                 if not response.ok:
                     raise ConnectionError(response.text())
-                variable_ontologies["scale_ontology_id"] = response.json()["id"]
+                variable_ontologies["scale_ontology_id"] = response.json()[
+                    "id"]
 
                 response = requests.post(
                     url="{}/variable_ontologies/".format(self.url_base),
