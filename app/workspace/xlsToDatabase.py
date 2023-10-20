@@ -58,7 +58,7 @@ def get_genotypes(path, list_csv_files):
 def get_environments(path, list_csv_files):
     source = search_file_by_regex(
         list_files=list_csv_files, end_with="_EnvData.xls")
-    web_file = source.replace("_EnvData.xls", "")
+    web_file = source.replace("_EnvData.xls", "").replace(" ","")
     file_name = rename_file_csv(
         path=path, source=source, destiny='env_data.csv')
     if os.path.isfile(file_name):
@@ -86,7 +86,7 @@ def get_raw_collections(path, list_csv_files):
         list_files=list_csv_files,
         end_with="_RawData.xls"
     )
-    web_file = source.replace("_RawData.xls", "")
+    web_file = source.replace("_RawData.xls", "").replace(" ","")
     file_name = rename_file_csv(path=path, source=source, destiny='raw.csv')
     if os.path.isfile(file_name):
         csv_data = pd.read_csv(

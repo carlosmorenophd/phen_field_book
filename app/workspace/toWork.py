@@ -129,7 +129,20 @@ class WorkSpace:
                     params={"name": traits["name"]},
                 )
                 if not response.ok:
-                    raise ConnectionError(response.text())
+                    response = requests.post(
+                        url="{}/traits/".format(self.url_base),
+                        headers={"Accept": "application/json"},
+                        json={
+                            "name": traits["name"],
+                            "number": "0",
+                            "description": "",
+                            "co_trait_name": traits["name"],
+                            "variable_name": traits["variable_name"],
+                            "co_id": traits["co_id"],
+                        }
+                    )
+                    if not response.ok:
+                        raise ConnectionError(response.text())
                 id = response.json()["id"]
                 traits["description"] = ""
                 traits["number"] = ""
