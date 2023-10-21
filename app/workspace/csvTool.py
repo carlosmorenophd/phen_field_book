@@ -47,10 +47,11 @@ def fix_csv_remove_comma(folder: str, target_csv: str, fixed_file: str = "fixed.
     target_file = path.join(folder, fixed_file)
     if path.exists(target_file):
         remove(target_file)
-    with open(source_file, 'r') as source_csv, open(target_file, 'wb') as target_csv:
+    with open(source_file, 'br') as source_csv, open(target_file, 'wb') as target_csv:
         lines = source_csv.readlines()
         for line in lines:
-            target_csv.write(bytes(line.replace(",",""), 'utf-8'))
+            new_line = line.decode('latin-1')
+            target_csv.write(bytes(new_line.replace(",",""), 'utf-8'))
     if overwrite:
         if path.exists(source_file):
             remove(source_file)
