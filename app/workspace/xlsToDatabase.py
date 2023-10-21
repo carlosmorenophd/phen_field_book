@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import requests
 import re
+from .csvTool import fix_csv_remove_comma
 
 
 def get_locations(path, list_csv_files):
@@ -88,6 +89,7 @@ def get_raw_collections(path, list_csv_files):
     )
     web_file = source.replace("_RawData.xls", "").replace(" ","")
     file_name = rename_file_csv(path=path, source=source, destiny='raw.csv')
+    fix_csv_remove_comma(folder=path, target_csv='raw.csv')
     if os.path.isfile(file_name):
         csv_data = pd.read_csv(
             file_name, delimiter='\t',
