@@ -121,20 +121,25 @@ def get_trait_details(path, list_csv_files):
         for key in csv_data:
             dic_general = {}
             dic_trait = {}
-            if ':' in csv_data[key].iloc[2, 3]:
-                str_temp = csv_data[key].iloc[2, 3].split(':')[1]
+            column_index= 3
+            cell_value = csv_data[key].iloc[2, column_index]
+            print(cell_value)
+            if pd.isna(cell_value):
+                column_index = column_index + 1
+            if ':' in csv_data[key].iloc[2, column_index]:
+                str_temp = csv_data[key].iloc[2, column_index].split(':')[1]
                 if '  ' in str_temp:
                     dic_trait['name'] = str_temp.split('  ')[0].strip()
                 else:
                     dic_trait['name'] = str_temp.strip()
-            if ':' in csv_data[key].iloc[3, 3]:
-                dic_trait['co_trait_name'] = csv_data[key].iloc[3, 3].split(':')[
+            if ':' in csv_data[key].iloc[3, column_index]:
+                dic_trait['co_trait_name'] = csv_data[key].iloc[3, column_index].split(':')[
                     1].strip()
-            if ':' in csv_data[key].iloc[4, 3]:
-                dic_trait['variable_name'] = csv_data[key].iloc[4, 3].split(':')[
+            if ':' in csv_data[key].iloc[4, column_index]:
+                dic_trait['variable_name'] = csv_data[key].iloc[4, column_index].split(':')[
                     1].strip()
-            if ' : ' in csv_data[key].iloc[5, 3]:
-                dic_trait['co_id'] = csv_data[key].iloc[5, 3].split(' : ')[
+            if ' : ' in csv_data[key].iloc[5, column_index]:
+                dic_trait['co_id'] = csv_data[key].iloc[5, column_index].split(' : ')[
                     1].strip()
             dic_general["traits"] = dic_trait
             if 'co_id' in dic_trait and dic_trait['co_id'] != '':

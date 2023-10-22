@@ -6,6 +6,7 @@
         "dotenv",
         "fastapi",
         "iloc",
+        "isna",
         "pandas",
         "pydantic",
         "pyunpack"
