@@ -27,6 +27,7 @@ class WorkSpace:
         extract_all_gz(destiny_folder)
 
     def work_with_all_zips(self):
+        
         for file in self.path_directory.get_all_files_zip():
             print("File to work {}".format(file))
             self.clean_workspace()
