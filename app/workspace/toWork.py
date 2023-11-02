@@ -12,9 +12,9 @@ from .xlsToDatabase import (
 
 
 class WorkSpace:
-    def __init__(self, path):
+    def __init__(self, path, api_storage):
         self.path_directory = PathDirectory(home=path)
-        self.url_base = "http://localhost:8000"
+        self.url_base = api_storage
 
     def clean_workspace(self):
         self.path_directory.clean_work_directory()
@@ -28,6 +28,7 @@ class WorkSpace:
 
     def work_with_all_zips(self):
         for file in self.path_directory.get_all_files_zip():
+            print("File to work {}".format(file))
             self.clean_workspace()
             self.prepare_folder_files(file_name=file)
             list_csv_files = self.path_directory.get_all_file_csv()
