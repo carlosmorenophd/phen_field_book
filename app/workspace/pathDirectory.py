@@ -6,9 +6,15 @@ class PathDirectory:
         self.parent_dir = home
         self.path_work = os.path.join(self.parent_dir, 'work_file')
         self.path_files = os.path.join(self.parent_dir, 'files')
+        print("Paths")
+        print(self.path_work)
+        print(self.path_files)
         self.list_files_zip = os.listdir(self.path_files)
+        if not os.path.exists(self.path_files):
+            os.mkdir(self.path_files)
         if not os.path.isdir(self.path_work):
             os.mkdir(self.path_work)
+        os.chmod(self.path_work, 0o0777)
 
     def get_work_directory(self):
         return self.path_work
@@ -41,4 +47,5 @@ class PathDirectory:
                 if os.path.isfile(file_path):
                     os.remove(file_path)
         except OSError:
+            print("Error to tray to clean files {}".format(OSError))
             raise FileNotFoundError("Error occurred while deleting files.")
