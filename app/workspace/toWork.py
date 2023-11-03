@@ -27,12 +27,12 @@ class WorkSpace:
         extract_all_gz(destiny_folder)
 
     def work_with_all_zips(self):
-        
         for file in self.path_directory.get_all_files_zip():
             print("File to work {}".format(file))
             self.clean_workspace()
             self.prepare_folder_files(file_name=file)
             list_csv_files = self.path_directory.get_all_file_csv()
+            print("List of files {}".format(list_csv_files))
             self.storage_on_database(list_csv_files=list_csv_files)
             self.path_directory.remove_file(file)
 
@@ -59,6 +59,7 @@ class WorkSpace:
         ))
 
     def store_location(self, locations):
+        print("Url to save => {}".format("{}/locations".format(self.url_base)))
         for location in locations:
             url = "{}/locations".format(self.url_base)
             response = requests.post(

@@ -13,8 +13,8 @@ def run_project():
             work_space = WorkSpace(path=getenv(
                 "PATH_TO_SCRAPPING"), api_storage=getenv("URL_DATA_WAREHOUSE"))
             work_space.work_with_all_zips()
-        except:
-            print("File to work with file")
+        except Exception as error:
+            print("Error to work: ", error)
         time.sleep(60)
 
 
