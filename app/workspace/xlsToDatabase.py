@@ -59,7 +59,7 @@ def get_genotypes(path, list_csv_files):
 def get_environments(path, list_csv_files):
     source = search_file_by_regex(
         list_files=list_csv_files, end_with="_EnvData.xls")
-    web_file = source.replace("_EnvData.xls", "").replace(" ","")
+    web_file = source.replace("_EnvData.xls", "").replace(" ", "")
     file_name = rename_file_csv(
         path=path, source=source, destiny='env_data.csv')
     if os.path.isfile(file_name):
@@ -87,7 +87,7 @@ def get_raw_collections(path, list_csv_files):
         list_files=list_csv_files,
         end_with="_RawData.xls"
     )
-    web_file = source.replace("_RawData.xls", "").replace(" ","")
+    web_file = source.replace("_RawData.xls", "").replace(" ", "")
     file_name = rename_file_csv(path=path, source=source, destiny='raw.csv')
     fix_csv_remove_comma(folder=path, target_csv='raw.csv')
     if os.path.isfile(file_name):
@@ -111,6 +111,7 @@ def get_raw_collections(path, list_csv_files):
 
 
 def get_trait_details(path, list_csv_files):
+    print("Start to search trait details")
     source = search_file_by_regex(
         list_files=list_csv_files, end_with="IDYN.xls", end_with_double="IDYN.xlsx")
     print(source)
@@ -121,20 +122,23 @@ def get_trait_details(path, list_csv_files):
         for key in csv_data:
             dic_general = {}
             dic_trait = {}
-            if ':' in csv_data[key].iloc[2, 3]:
-                str_temp = csv_data[key].iloc[2, 3].split(':')[1]
+            index_column = 3
+            if pd.isnull(csv_data[key].iloc[2, 3]):
+                index_column = 4
+            if ':' in csv_data[key].iloc[2, index_column]:
+                str_temp = csv_data[key].iloc[2, index_column].split(':')[1]
                 if '  ' in str_temp:
                     dic_trait['name'] = str_temp.split('  ')[0].strip()
                 else:
                     dic_trait['name'] = str_temp.strip()
-            if ':' in csv_data[key].iloc[3, 3]:
-                dic_trait['co_trait_name'] = csv_data[key].iloc[3, 3].split(':')[
+            if ':' in csv_data[key].iloc[3, index_column]:
+                dic_trait['co_trait_name'] = csv_data[key].iloc[3, index_column].split(':')[
                     1].strip()
-            if ':' in csv_data[key].iloc[4, 3]:
-                dic_trait['variable_name'] = csv_data[key].iloc[4, 3].split(':')[
+            if ':' in csv_data[key].iloc[4, index_column]:
+                dic_trait['variable_name'] = csv_data[key].iloc[4, index_column].split(':')[
                     1].strip()
-            if ' : ' in csv_data[key].iloc[5, 3]:
-                dic_trait['co_id'] = csv_data[key].iloc[5, 3].split(' : ')[
+            if ' : ' in csv_data[key].iloc[5, index_column]:
+                dic_trait['co_id'] = csv_data[key].iloc[5, index_column].split(' : ')[
                     1].strip()
             dic_general["traits"] = dic_trait
             if 'co_id' in dic_trait and dic_trait['co_id'] != '':
