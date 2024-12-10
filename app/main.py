@@ -5,6 +5,15 @@ import time
 
 load_dotenv()
 
+<<<<<<< HEAD
+=======
+def run_project():
+    work_space = WorkSpace("/home/Yeiden/Documents/wirk/")
+    work_space.work_with_all_zips()
+    # work_space.clean_workspace()
+    # work_space.prepare_folder_files("dataverse_files.zip")
+    # work_space.storage_on_database()
+>>>>>>> hotfix/23.10.21
 
 def run_project():
     if getenv("DEBUG"):
