@@ -1,4 +1,4 @@
-FROM python:3.9.18-bullseye
+FROM python:3.10-slim-bookworm
 
 WORKDIR /app
 
@@ -7,7 +7,7 @@ RUN pip install --no-cache-dir --upgrade -r /requirements.txt
 
 RUN apt-get update && apt-get install -y p7zip
 
-COPY app/ .
+COPY src/ .
 
 RUN mkdir -p /wirk
 RUN mkdir -p /wirk/files

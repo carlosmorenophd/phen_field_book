@@ -1,0 +1,26 @@
+{
+    "cSpell.ignoreWords": [
+        "IDYN",
+        "Latitud",
+        "backref",
+        "degress",
+        "dotenv",
+        "fastapi",
+        "iloc",
+        "isna",
+        "pandas",
+        "phen",
+        "pydantic",
+        "pyunpack",
+        "tasksdd"
+    ],
+    "cSpell.words": [
+        "uvicorn"
+    ],
+    "workbench.colorCustomizations": {
+        "activityBar.background": "#aab99f"
+    },
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.autopep8"
+    }
+}

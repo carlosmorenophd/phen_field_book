@@ -9,8 +9,10 @@
         "iloc",
         "isna",
         "pandas",
+        "phen",
         "pydantic",
-        "pyunpack"
+        "pyunpack",
+        "tasksdd"
     ],
     "cSpell.words": [
         "uvicorn"
