@@ -47,18 +47,18 @@ class WorkSpace:
         """
         source_file = self.path_directory.get_file_from_file_directory(
             file=file_name)
-        destiny_folder = self.path_directory.get_work_directory()
+        destiny_folder = self.path_directory.work_directory()
         unzip_file(source_file=source_file, destiny_folder=destiny_folder)
         extract_all_gz(destiny_folder)
 
     def work_with_all_zips(self):
         """Method to work with a zip file
         """
-        for file in self.path_directory.get_all_files_zip():
+        for file in self.path_directory.all_files_zip():
             print(f"File to work {file}")
             self.clean_workspace()
             self.prepare_folder_files(file_name=file)
-            list_csv_files = self.path_directory.get_all_file_csv()
+            list_csv_files = self.path_directory.all_file_csv()
             print(f"List of files {list_csv_files}")
             self.storage_on_database(list_csv_files=list_csv_files)
             self.path_directory.remove_file(file)
@@ -70,23 +70,23 @@ class WorkSpace:
             list_csv_files (_type_): list the files to store on API rest database
         """
         self.store_location(locations=get_locations(
-            path=self.path_directory.get_work_directory(),
+            path=self.path_directory.work_directory(),
             list_csv_files=list_csv_files,
         ))
         self.store_genotype(genotypes=get_genotypes(
-            path=self.path_directory.get_work_directory(),
+            path=self.path_directory.work_directory(),
             list_csv_files=list_csv_files,
         ))
         self.store_environments(environments=get_environments(
-            path=self.path_directory.get_work_directory(),
+            path=self.path_directory.work_directory(),
             list_csv_files=list_csv_files
         ))
         self.store_raw_collection(raw_collections=get_raw_collections(
-            path=self.path_directory.get_work_directory(),
+            path=self.path_directory.work_directory(),
             list_csv_files=list_csv_files,
         ))
         self.store_trait_detail(trait_details=get_trait_details(
-            path=self.path_directory.get_work_directory(),
+            path=self.path_directory.work_directory(),
             list_csv_files=list_csv_files,
         ))
 

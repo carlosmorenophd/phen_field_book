@@ -1,36 +1,80 @@
+"""Tool to work with some xls files"""
 import os
+import re
+
 import pandas as pd
 import requests
-import re
-from .csvTool import fix_csv_remove_comma
+
+from src.csvTool import fix_csv_remove_comma
 
 
-def get_locations(path, list_csv_files):
+def get_locations(path: str, list_csv_files: list) -> dict:
+    """Get location into dictionary
+
+    Args:
+        path (_type_): work directory
+        list_csv_files (_type_): list of files 
+
+    Raises:
+        FileNotFoundError: Not found file
+
+    Returns:
+        dict: dict with location
+    """
     source = search_file_by_regex(
-        list_files=list_csv_files, end_with="Loc_data.xls")
+        list_files=list_csv_files,
+        end_with="Loc_data.xls",
+    )
     file_name = rename_file_csv(
-        path=path, source=source, destiny='location.csv')
+        path=path, source=source,
+        destiny='location.csv',
+    )
     if os.path.isfile(file_name):
-        csv_data = pd.read_csv(file_name, delimiter='\t',
-                               engine='python', header=None, )
+        csv_data = pd.read_csv(
+            file_name,
+            delimiter='\t',
+            engine='python',
+            header=None,
+        )
         csv_dictionary = csv_data.to_dict('index')
         head = csv_dictionary.pop(0)
-        return get_dictionary_by_entity(entity='locations', head=head, csv_dictionary=csv_dictionary)
-    else:
-        raise FileNotFoundError('Filing to save file or not exist it')
+        return get_dictionary_by_entity(
+            entity='locations',
+            head=head,
+            csv_dictionary=csv_dictionary
+        )
+    raise FileNotFoundError('Filing to save file or not exist it')
 
 
-def search_file_by_regex(list_files, end_with, end_with_double: str = ""):
+def search_file_by_regex(
+    list_files: list,
+    end_with: str,
+    end_with_double: str = ""
+):
+    """Return file that have regex equal
+
+    Args:
+        list_files (list): list of files
+        end_with (str): regex end with
+        end_with_double (str, optional): regex double end. Defaults to "".
+
+    Raises:
+        FileNotFoundError: Not have this files 
+
+    Returns:
+        _type_: file name
+    """
+
     for file in list_files:
-        x = re.search("{}$".format(end_with), file)
+        x = re.search(f"{end_with}$", file)
         if x:
             return file
         if end_with_double != "":
-            x = re.search("{}$".format(end_with_double), file)
+            x = re.search(f"{end_with_double}$", file)
             if x:
                 return file
     raise FileNotFoundError(
-        "Can not find the file to work - {}".format(end_with))
+        f"Can not find the file to work - {end_with}")
 
 
 def get_genotypes(path, list_csv_files):
