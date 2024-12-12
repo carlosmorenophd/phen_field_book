@@ -1,0 +1,23 @@
+services:
+  tasksdd:
+    build:
+      context: tasks/
+      dockerfile: Dockerfile
+    environment:
+      - URL_DATA_WAREHOUSE=${URL_DATA_WAREHOUSE}
+      - FOLDER_DATA=${FOLDER_DATA}
+      - MODE_DAEMON=${MODE_DAEMON}
+    networks:
+      phen-net:
+        aliases:
+          - phen-net-field-book
+    volumes:
+      - "./tasks:/app"
+      - "${PATH_TO_CACHE}:/app/cache"
+    tty: true
+    stdin_open: true
+
+networks:
+  phen-net:
+    external: true
+    name: phen-net

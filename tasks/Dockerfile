@@ -1,4 +1,4 @@
-FROM python:3.10-slim-bookworm
+FROM python:3.12-slim-bookworm
 
 WORKDIR /app
 
@@ -8,10 +8,6 @@ RUN pip install --no-cache-dir --upgrade -r /requirements.txt
 RUN apt-get update && apt-get install -y p7zip
 
 COPY src/ .
-
-RUN mkdir -p /wirk
-RUN mkdir -p /wirk/files
-RUN chown -R 777 /wirk
 
 
 CMD ["python", "-u",  "main.py"]
