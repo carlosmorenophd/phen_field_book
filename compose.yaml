@@ -2,7 +2,7 @@ services:
   tasksdd:
     build:
       context: tasks/
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
     environment:
       - URL_DATA_WAREHOUSE=${URL_DATA_WAREHOUSE}
       - FOLDER_DATA=${FOLDER_DATA}
