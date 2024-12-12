@@ -18,7 +18,7 @@
         "uvicorn"
     ],
     "workbench.colorCustomizations": {
-        "activityBar.background": "#aab99f"
+        "activityBar.background": "#1d3d79"
     },
     "[python]": {
         "editor.defaultFormatter": "ms-python.autopep8"
