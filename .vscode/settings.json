@@ -9,14 +9,16 @@
         "iloc",
         "isna",
         "pandas",
+        "phen",
         "pydantic",
-        "pyunpack"
+        "pyunpack",
+        "tasksdd"
     ],
     "cSpell.words": [
         "uvicorn"
     ],
     "workbench.colorCustomizations": {
-        "activityBar.background": "#576150"
+        "activityBar.background": "#ffffff"
     },
     "[python]": {
         "editor.defaultFormatter": "ms-python.autopep8"
