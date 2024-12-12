@@ -77,7 +77,19 @@ def search_file_by_regex(
         f"Can not find the file to work - {end_with}")
 
 
-def get_genotypes(path, list_csv_files):
+def get_genotypes(path: str, list_csv_files: list) -> dict:
+    """get genotype
+
+    Args:
+        path (str): path to folder
+        list_csv_files (_type_): _description_
+
+    Raises:
+        FileNotFoundError: Not found the file
+
+    Returns:
+        dict: Dictionary of genotype
+    """
     source = search_file_by_regex(
         list_files=list_csv_files, end_with="Genotypes_Data.xls")
     file_name = rename_file_csv(
@@ -96,8 +108,7 @@ def get_genotypes(path, list_csv_files):
             head=head,
             csv_dictionary=csv_dictionary
         )
-    else:
-        raise FileNotFoundError('Filing to save file or not exist it')
+    raise FileNotFoundError(f"Filing to save {file_name} or not exist it")
 
 
 def get_environments(path, list_csv_files):
