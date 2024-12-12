@@ -4,8 +4,9 @@ services:
       context: tasks/
       dockerfile: Dockerfile.dev
     environment:
-      - REDIS_URL=${REDIS_URL}
+      - URL_DATA_WAREHOUSE=${URL_DATA_WAREHOUSE}
       - FOLDER_DATA=${FOLDER_DATA}
+      - MODE_DAEMON=${MODE_DAEMON}
     networks:
       phen-net:
         aliases:
