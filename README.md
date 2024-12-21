@@ -47,11 +47,11 @@ docker compose -f compose.yaml up -d
 ```
 4. Place data files:
 
-Put your zip files in a folder named files within the configured data storage path (omitted).
+Put your zip files in a folder that linked by the variable `PATH_TO_CACHE` in some folder called `files`.
 
 5. Process data:
 
-The service will store the data in its internal database.
+The service every 6 seconds review this folder to process new files and store on database.
 
 6. Analyze data:
 
